@@ -1,0 +1,350 @@
+<html><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EXDC Token - Distributed File Exchange & Shop Creation Platform</title>
+  <link rel="icon" type="image/png" href="/img/exdc.svg">
+  <link rel="shortcut icon" href="/img/exdc.svg">
+	<meta name="description" content="EXDC Token - Distributed File Exchange & Shop Creation Platform">
+	<meta name="img" content="https://exdc.cc/img/preview.png">
+  <meta property="og:image" content="https://exdc.cc/img/preview.png">
+  <meta name="twitter:image" content="https://exdc.cc/img/preview.png">
+  <meta name=”robots” content="index, follow">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.5.2/web3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <style>
+    :root {
+      --primary-color: #FF7EDF;
+      --secondary-color: #9A4CFF;
+      --background-color: #08060B;
+      --text-color: #F4EEFF;
+      --accent-color: #31D0AA;
+    }
+    body {
+      font-family: 'Kanit', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    .nav-links a {
+      color: var(--text-color);
+      text-decoration: none;
+      margin-left: 20px;
+      transition: color 0.3s ease;
+    }
+    .nav-links a:hover {
+      color: var(--primary-color);
+    }
+    .hero {
+      text-align: center;
+      padding: 100px 0;
+      position: relative;
+    }
+    h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    h2 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    .subtitle {
+      font-size: 24px;
+      margin-bottom: 40px;
+    }
+    .cta-button {
+      background-color: var(--primary-color);
+      color: var(--background-color);
+      border: none;
+      padding: 12px 24px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .cta-button:hover {
+      background-color: var(--secondary-color);
+    }
+    .features {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-top: 100px;
+    }
+    .feature {
+      text-align: center;
+      max-width: 300px;
+      margin-bottom: 40px;
+    }
+    .feature h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .feature p {
+      font-size: 16px;
+    }
+    .pancakes {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNjQiIHI9IjY0IiBmaWxsPSIjRkZDMDAwIi8+CjxwYXRoIGQ9Ik00MCA0MEg4OFY4OEg0MFY0MFoiIGZpbGw9IiNGRkYwQkYiLz4KPHBhdGggZD0iTTU2IDcySDcyVjg4SDU2Vjc3WiIgZmlsbD0iI0ZGQTIwMCIvPgo8L3N2Zz4K');
+      background-size: contain;
+    }
+    #uniswap-animation {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .page {
+      padding: 50px 0;
+    }
+    .page p {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .use-case {
+      background-color: rgba(255, 126, 223, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .use-case h3 {
+      color: var(--primary-color);
+    }
+    .platform-demo {
+      background-color: rgba(49, 208, 170, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 40px;
+    }
+    .platform-demo h3 {
+      color: var(--accent-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <div class="logo">EXDC</div>
+      <div class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#features">Features</a>
+        <a href="#possibilities">Possibilities</a>
+        <a href="#platforms">Platforms</a>
+        <a href="#exchange">Exchange</a>
+      </div>
+    </nav>
+
+    <section id="home" class="hero">
+      <h1>EXDC Token</h1>
+      <p class="subtitle">Distributed File Exchange & Shop Creation Platform on Polygon Network</p>
+      <button class="cta-button" data-href="https://starpy.me">Get Started</button>
+
+      <div id="pancake-container"></div>
+      <svg id="uniswap-animation" width="200" height="200" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="90" fill="none" stroke="#FF7EDF" stroke-width="4"/>
+        <circle cx="100" cy="100" r="70" fill="none" stroke="#9A4CFF" stroke-width="4"/>
+        <circle cx="100" cy="100" r="50" fill="none" stroke="#FF7EDF" stroke-width="4"/>
+      </svg>
+    </section>
+
+    <section id="about" class="page">
+      <h2>About EXDC</h2>
+      <p>EXDC is a revolutionary token that enables the distributed exchange of any files for any ERC20 token on the Polygon network. Our platform goes beyond simple file exchange, allowing users to create and operate various types of shops without any technical expertise.</p>
+    </section>
+
+    <section id="platforms" class="page">
+      <h2>EXDC Platforms</h2>
+      <p>EXDC offers multiple platforms to cater to different needs and use cases:</p>
+
+      <div class="platform-demo">
+        <h3>Starpy.me</h3>
+        <p>Starpy.me is our comprehensive shop creation platform that allows anyone to create instant shops without the need for an operator. With Starpy.me, you can:</p>
+        <ul>
+          <li>Set up a fully customizable shop in minutes</li>
+          <li>Manage inventory and process orders automatically</li>
+          <li>Accept payments in EXDC tokens and other supported cryptocurrencies</li>
+          <li>Leverage advanced features for a complete e-commerce experience</li>
+        </ul>
+        <button class="cta-button" data-href="https://starpy.me">Explore Starpy.me</button>
+      </div>
+
+      <div class="platform-demo">
+        <h3>Cryptofans.io</h3>
+        <p>Cryptofans.io offers a simplified vending machine experience for content creators, particularly those dealing with photos and videos. Our API provides an easy option to create instant vending machines:</p>
+        <ul>
+          <li>Quick setup for selling photos and videos</li>
+          <li>Seamless integration with existing platforms</li>
+          <li>Automated content delivery upon payment</li>
+          <li>Perfect for influencers, artists, and content creators</li>
+        </ul>
+        <button class="cta-button" data-href="https://cryptofans.io">Try Cryptofans.io</button>
+      </div>
+    </section>
+    
+    <section id="features" class="features">
+      <div class="feature">
+        <h3>Decentralized File Exchange</h3>
+        <p>Exchange any file for ERC20 tokens on the Polygon network</p>
+      </div>
+      <div class="feature">
+        <h3>Open Shop Platform</h3>
+        <p>Build and customize any kind of shop on our decentralized platform</p>
+      </div>
+      <div class="feature">
+        <h3>Low Fees</h3>
+        <p>Benefit from Polygon's scalability and low transaction costs</p>
+      </div>
+      <div class="feature">
+        <h3>Instant Shop Creation</h3>
+        <p>Create shops instantly with our platforms, no operator needed</p>
+      </div>
+    </section>
+
+
+    <section id="possibilities" class="page">
+      <h2>Possibilities of EXDC Exchange</h2>
+      <div class="use-case">
+        <h3>Digital Content Marketplace</h3>
+        <p>Create a decentralized marketplace for digital content creators to sell their work directly to consumers, cutting out intermediaries and reducing fees.</p>
+      </div>
+      <div class="use-case">
+        <h3>Peer-to-Peer File Sharing</h3>
+        <p>Enable secure and incentivized file sharing between users, where valuable files can be exchanged for tokens.</p>
+      </div>
+      <div class="use-case">
+        <h3>Decentralized E-commerce Platform</h3>
+        <p>Build online stores for physical or digital products, leveraging blockchain for secure transactions and inventory management.</p>
+      </div>
+      <div class="use-case">
+        <h3>Tokenized Knowledge Exchange</h3>
+        <p>Facilitate the exchange of research papers, educational content, or expert knowledge, where contributors are rewarded with tokens.</p>
+      </div>
+    </section>
+
+    <section id="exchange" class="page">
+      <h2>How to Exchange</h2>
+      <p>Exchanging files or creating shops using EXDC is simple:</p>
+      <ol>
+        <li>Connect your wallet to our platform</li>
+        <li>For file exchange:
+          <ul>
+            <li>Upload the file you want to exchange</li>
+            <li>Set the price in EXDC tokens or any other supported ERC20 token</li>
+            <li>Wait for a buyer to purchase your file</li>
+          </ul>
+        </li>
+        <li>For shop creation:
+          <ul>
+            <li>Choose between Starpy.me for full shops or Cryptofans.io for simple vending machines</li>
+            <li>Follow the platform's easy setup process</li>
+            <li>Add your products or content</li>
+            <li>Start selling and earning EXDC tokens</li>
+          </ul>
+        </li>
+        <li>Receive tokens directly in your wallet once transactions are complete</li>
+      </ol>
+      <button class="cta-button" data-href="https://app.uniswap.org/swap?theme=dark&inputCurrency=0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359&outputCurrency=0xD75dc076cDB0E692214371924B6640c545F688C6&chain=polygon">Buy EXDC now</button>
+    </section>
+  </div>
+
+  <script>
+    // Pancake animation
+    function createPancake() {
+      const pancake = document.createElement('div');
+      pancake.classList.add('pancakes');
+      pancake.style.left = `${Math.random() * 100}vw`;
+      pancake.style.top = `-80px`;
+      document.getElementById('pancake-container').appendChild(pancake);
+
+      gsap.to(pancake, {
+        y: `${window.innerHeight + 80}px`,
+        rotation: Math.random() * 720 - 360,
+        duration: Math.random() * 5 + 5,
+        ease: 'none',
+        onComplete: () => {
+          pancake.remove();
+        }
+      });
+    }
+
+    setInterval(createPancake, 1000);
+
+    // Uniswap-style animation
+    const uniswapAnimation = document.getElementById('uniswap-animation');
+    const circles = uniswapAnimation.querySelectorAll('circle');
+
+    gsap.to(circles, {
+      rotation: 360,
+      transformOrigin: '50% 50%',
+      duration: 20,
+      ease: 'none',
+      repeat: -1,
+      stagger: 0.5
+    });
+
+    // Web3 integration
+    window.addEventListener('load', async () => {
+      if (window.ethereum) {
+        window.web3 = new Web3(ethereum);
+        try {
+          await ethereum.enable();
+          console.log("Web3 initialized!");
+        } catch (error) {
+          console.error("User denied account access");
+        }
+      } else if (window.web3) {
+        window.web3 = new Web3(web3.currentProvider);
+        console.log("Web3 initialized!");
+      } else {
+        console.log('Non-Ethereum browser detected. Consider trying MetaMask!');
+      }
+    });
+
+    // CTA button functionality
+    document.querySelectorAll('.cta-button').forEach(button => {
+      button.addEventListener('click', () => {
+        window.open(button.getAttribute("data-href"), '_blank').focus();
+        // if (window.web3) {
+        //   // Here you would typically interact with your smart contract
+        //   console.log("Interacting with EXDC smart contract...");
+        //   alert("Connect your wallet to get started with EXDC!");
+        // } else {
+        //   alert("Please install MetaMask to interact with EXDC!");
+        // }
+      });
+    });
+
+    // Smooth scrolling for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+</body></html>
