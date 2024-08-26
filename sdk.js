@@ -10,7 +10,7 @@ function EXDC_SDK(params = {}) {
   let products = [];
   let orderKey;
   let provider, signer, address;
-  const n = params.n || (new URL(window.location.href)).searchParams.get("n") || 137
+  const n = params.n || 137
   let erc20ContractAddress = utils.exchangeTokenAddress();
   let decimals = 18;
   let storedJSON = {};
@@ -388,7 +388,7 @@ function EXDC_SDK(params = {}) {
     if (address) {
       const balance = await provider.getBalance(address);
       const etherBalance = ethers.utils.formatEther(balance);
-  
+      
       const usdtContract = new ethers.Contract(erc20ContractAddress, utils.erc20abi, provider);
       const usdtBalance = await usdtContract.balanceOf(address);
       const symbol = await usdtContract.symbol()
@@ -429,7 +429,9 @@ function EXDC_SDK(params = {}) {
     buyServiceSmart,
     checkServiceValid,
     getServicePaymentInfo,
-    inputPassword
+    inputPassword,
+    erc20ContractAddress,
+    address
   };
 }
 window.EXDC_SDK = EXDC_SDK
