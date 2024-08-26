@@ -290,7 +290,7 @@ export function EXDC_UTILS() {
 
 
   const exchangeTokenAddress = () =>
-    networkToContract[window.ethereum.networkVersion];
+    networkToContract[parseInt(window.ethereum.networkVersion, 10)];
 
   const networkToContract = {
     80002: '0x863D66d6692FE5D2e422DF771750cb14295a4D02',
@@ -367,6 +367,7 @@ export function EXDC_UTILS() {
       blockExplorerUrls: ['https://www.oklink.com/amoy'],
     },
   };
+
   return {
     networks,
     networkToContract,

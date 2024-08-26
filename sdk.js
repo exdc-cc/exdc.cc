@@ -11,7 +11,7 @@ function EXDC_SDK(params = {}) {
   let orderKey;
   let provider, signer, address;
   const n = params.n || (new URL(window.location.href)).searchParams.get("n") || 137
-  let erc20ContractAddress = utils.exchangeTokenAddress(); // Example USDT contract on BSC Testnet
+  let erc20ContractAddress = utils.exchangeTokenAddress();
   let decimals = 18;
   let storedJSON = {};
   const address0 = '0x0000000000000000000000000000000000000000';
