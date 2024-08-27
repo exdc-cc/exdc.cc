@@ -289,8 +289,8 @@ export function EXDC_UTILS() {
   ]
 
 
-  const exchangeTokenAddress = () =>
-    networkToContract[parseInt(window.ethereum.networkVersion, 10)];
+  const exchangeTokenAddress = (n) =>
+    networkToContract[n];
 
   const networkToContract = {
     80002: '0x863D66d6692FE5D2e422DF771750cb14295a4D02',

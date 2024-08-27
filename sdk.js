@@ -11,7 +11,7 @@ function EXDC_SDK(params = {}) {
   let orderKey;
   let provider, signer, address;
   const n = params.n || 137
-  let erc20ContractAddress = utils.exchangeTokenAddress();
+  let erc20ContractAddress = utils.exchangeTokenAddress(n);
   let decimals = 18;
   let storedJSON = {};
   const address0 = '0x0000000000000000000000000000000000000000';
