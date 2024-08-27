@@ -1,4 +1,5 @@
 import {EXDC_UTILS} from "./util.js"
+
 function EXDC_SDK(params = {}) {
 
   let categories = [
@@ -38,7 +39,7 @@ function EXDC_SDK(params = {}) {
   }
 
   const processExchangeContractData = async (data) => {
-    const abiCoder = new ethers.utils.AbiCoder();
+    const abiCoder = new ethers.AbiCoder();
     try {
       const decode = await abiCoder.decode(["string"], data)
       return JSON.parse(decode);
@@ -54,7 +55,7 @@ function EXDC_SDK(params = {}) {
   
   
   const generateOrderBody = async (nload) => {
-    const abiCoder = new ethers.utils.AbiCoder();
+    const abiCoder = new ethers.AbiCoder();
     const aeskey = await generateAesKey();
     const keypair = await generateNewKeyPair();
     nload.publicKey = keypair.publicKey;
@@ -76,11 +77,11 @@ function EXDC_SDK(params = {}) {
   
   const getCurrentOrder = async (q) => {
     const signer = await provider.getSigner();
-    const shop = new ethers.Contract(q, utils.exchangeContractAbi, signer);
+    const shop = new ethers.Contract(q, utils.exchangeServiceABI, signer);
     const prevOrder = await shop.buyerOrders(address)
     // console.info('currentOrder', prevOrder)
     if (prevOrder !== address0) {
-      const contract = new ethers.Contract(prevOrder, buyContractAbi, signer);
+      const contract = new ethers.Contract(prevOrder, utils.exchangeContractABI, signer);
       contract.contractAddress = prevOrder;
       return contract;
     }
@@ -94,7 +95,7 @@ function EXDC_SDK(params = {}) {
     cart
   ) => {
     const signer = await provider.getSigner();
-    const shop = new ethers.Contract(q, exchangeContractAbi, signer);
+    const shop = new ethers.Contract(q, utils.exchangeServiceABI, signer);
     const coin = await shop.wp();
     const nload = {cart, deliveryAddress}
     // console.info('nload', nload)
@@ -102,13 +103,13 @@ function EXDC_SDK(params = {}) {
     try {
       contract = await getCurrentOrder()
       if (contract) {
-        const state = ethers.utils.formatUnits(await contract.state(), 10) * 10
+        const state = ethers.formatUnits(await contract.state(), 10) * 10
         if(state > 2) {
           return true;
         }
         const {contractAddress} = contract;
-        const balance = ethers.utils.formatUnits(await contract.balanceOfContract(), decimals)
-        const price = ethers.utils.formatUnits(await contract.price(), decimals)
+        const balance = ethers.formatUnits(await contract.balanceOfContract(), decimals)
+        const price = ethers.formatUnits(await contract.price(), decimals)
         // console.info("balance", balance, price, contract, contractAddress)
         if (balance < price) {
           await sendCoin(coin, contractAddress, price - balance);
@@ -141,7 +142,7 @@ function EXDC_SDK(params = {}) {
     valueNum,
   ) {
     const erc20 = new ethers.Contract(coin, utils.erc20abi, await provider.getSigner());
-    const amount = ethers.utils.parseUnits(
+    const amount = ethers.parseUnits(
       valueNum.toString(),
       decimals,
     );
@@ -160,12 +161,12 @@ function EXDC_SDK(params = {}) {
   const receiveOrder = async () => {
     try {
       const order = await getCurrentOrder()
-      const state = ethers.utils.formatUnits(await order.state(), 1) * 10
+      const state = ethers.formatUnits(await order.state(), 1) * 10
       if(state < 4) {
         throw new Error("Waiting for the order to be delivered")
         return;
       }
-      const abiCoder = new ethers.utils.AbiCoder()
+      const abiCoder = new ethers.AbiCoder()
       const deliveryData = JSON.parse(abiCoder.decode(["string"], await order.deliveryData())[0])
       let localKey = localStorage.getItem("easkp")
   
@@ -225,9 +226,9 @@ function EXDC_SDK(params = {}) {
       try {
         // Request account access
         await window.ethereum.request({ method: 'eth_requestAccounts' });
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
-        address = await signer.getAddress();
+        provider = new ethers.BrowserProvider(window.ethereum)
+        signer = await provider.getSigner();
+        address = signer.address;
   
         // Switch network
         try {
@@ -259,17 +260,40 @@ function EXDC_SDK(params = {}) {
     }
   }
 
+  const getStorageAddress = async () => {
+    const token = await connectToExchangeToken();
+    const storageCategory = await token.categories('storage', 0);
+    const storageAddress = storageCategory;
+    return storageAddress;
+  };
+
+  const getCryptoFansAddress = async () => {
+    const token = await connectToExchangeToken();
+    console.info("token", token)
+    const storageCategory = await token.categories('cryptofans', 0);
+    const storageAddress = storageCategory;
+    return storageAddress;
+  };
+
   const connectToExchangeToken = async () =>
     new ethers.Contract(
-      exchangeTokenAddress(),
-      ExchangeToken__factory.abi,
+      utils.exchangeTokenAddress(n),
+      utils.exchangeTokenABI,
       signer,
     );
 
   const connectToExchangeService = async (address) =>
     new ethers.Contract(
       address,
-      utils.exchangeContractAbi,
+      utils.exchangeServiceABI,
+      signer,
+    );
+  
+
+  const connectToExchangeContract = async (address) =>
+    new ethers.Contract(
+      address,
+      utils.exchangeContractABI,
       signer,
     );
   
@@ -279,7 +303,7 @@ function EXDC_SDK(params = {}) {
     const shop = await connectToExchangeService(serviceAddress);
     const coin = await shop.wp();
     const sig = signer
-    const erc20 = new ethers.Contract(coin, ERC20__factory.abi, sig);
+    const erc20 = new ethers.Contract(coin, utils.erc20abi, sig);
     const decimals = ethers.toBigInt(10) ** (await erc20.decimals());
     const price = await shop.defaultPrice();
     const subInterval = ethers.toNumber(await shop.requiresSubs());
@@ -387,12 +411,12 @@ function EXDC_SDK(params = {}) {
   async function getWalletInfo() {
     if (address) {
       const balance = await provider.getBalance(address);
-      const etherBalance = ethers.utils.formatEther(balance);
+      const etherBalance = ethers.formatEther(balance);
       
       const usdtContract = new ethers.Contract(erc20ContractAddress, utils.erc20abi, provider);
       const usdtBalance = await usdtContract.balanceOf(address);
       const symbol = await usdtContract.symbol()
-      const usdtBalanceFormatted = ethers.utils.formatUnits(usdtBalance, decimals); // Assuming 18 decimals, adjust if different
+      const usdtBalanceFormatted = ethers.formatUnits(usdtBalance, decimals); // Assuming 18 decimals, adjust if different
   
       return {
         textContent:`Address: ${address.slice(0, 6)}...${address.slice(-4)} | ETH: ${parseFloat(etherBalance).toFixed(4)} | ${symbol}: ${parseFloat(usdtBalanceFormatted).toFixed(2)}`,
@@ -430,8 +454,11 @@ function EXDC_SDK(params = {}) {
     checkServiceValid,
     getServicePaymentInfo,
     inputPassword,
+    getStorageAddress,
+    getCryptoFansAddress,
     erc20ContractAddress,
-    address
+    address,
+    connectToExchangeContract
   };
 }
 window.EXDC_SDK = EXDC_SDK

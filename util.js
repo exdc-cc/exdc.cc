@@ -1,3 +1,8 @@
+
+import {exchangeTokenABI} from './exchangeToken.js'
+import {exchangeServiceABI} from './exchangeService.js'
+import {exchangeContractABI} from './exchangeContract.js'
+
 export function EXDC_UTILS() {
 
   const keyEncAlgo = {
@@ -385,6 +390,9 @@ export function EXDC_UTILS() {
     generateNewKeyPair,
     decryptPart,
     generateAesKey,
-    exchangeTokenAddress
+    exchangeTokenAddress,
+    exchangeTokenABI,
+    exchangeServiceABI,
+    exchangeContractABI
   }
 }
