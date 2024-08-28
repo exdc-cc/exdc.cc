@@ -166,7 +166,7 @@
     <section id="home" class="hero">
       <h1>EXDC Token</h1>
       <p class="subtitle">Distributed File Exchange & Shop Creation Platform on Polygon Network</p>
-      <button class="cta-button" data-href="https://starpy.me">Get Started</button>
+      <button class="cta-button" id="free-exdc">GET 50 EXDC</button>
 
       <div id="pancake-container"></div>
       <svg id="uniswap-animation" width="200" height="200" viewBox="0 0 200 200">
@@ -301,6 +301,7 @@
     // Uniswap-style animation
     const uniswapAnimation = document.getElementById('uniswap-animation');
     const circles = uniswapAnimation.querySelectorAll('circle');
+    const freeExdc = document.getElementById("free-exdc")
 
     gsap.to(circles, {
       rotation: 360,
@@ -311,35 +312,63 @@
       stagger: 0.5
     });
 
-    // Web3 integration
-    window.addEventListener('load', async () => {
-      if (window.ethereum) {
-        window.web3 = new Web3(ethereum);
-        try {
-          await ethereum.enable();
-          console.log("Web3 initialized!");
-        } catch (error) {
-          console.error("User denied account access");
-        }
-      } else if (window.web3) {
-        window.web3 = new Web3(web3.currentProvider);
-        console.log("Web3 initialized!");
-      } else {
-        console.log('Non-Ethereum browser detected. Consider trying MetaMask!');
-      }
-    });
-
+    const faucetLink = "https://exdc.cc/faucet?address="
+    const tokenAddress = '0xD75dc076cDB0E692214371924B6640c545F688C6';
+    const tokenSymbol = 'EXDC';
+    const tokenDecimals = 18;
+    const tokenImage = 'https://exdc.cc/img/exdc.svg';
+    
     // CTA button functionality
     document.querySelectorAll('.cta-button').forEach(button => {
-      button.addEventListener('click', () => {
-        window.open(button.getAttribute("data-href"), '_blank').focus();
-        // if (window.web3) {
-        //   // Here you would typically interact with your smart contract
-        //   console.log("Interacting with EXDC smart contract...");
-        //   alert("Connect your wallet to get started with EXDC!");
-        // } else {
-        //   alert("Please install MetaMask to interact with EXDC!");
-        // }
+      button.addEventListener('click', async () => {
+        const lhref = button.getAttribute("data-href")
+        // console.info('lhref')
+        if(lhref !== "" && lhref !== undefined && lhref !== null)
+          window.open(lhref, '_blank').focus();
+        else {
+          const processConnection = async () => {
+
+            try {
+              // wasAdded is a boolean. Like any RPC method, an error may be thrown.
+              const wasAdded = await ethereum.request({
+                method: 'wallet_watchAsset',
+                params: {
+                  type: 'ERC20', // Initially only supports ERC20, but eventually more!
+                  options: {
+                    address: tokenAddress, // The address that the token is at.
+                    symbol: tokenSymbol, // A ticker symbol or shorthand, up to 5 chars.
+                    decimals: tokenDecimals, // The number of decimals in the token
+                    image: tokenImage, // A string url of the token logo
+                  },
+                },
+              });
+            
+              if (wasAdded) {
+                console.log('Thanks for your interest!');
+              } else {
+                console.log('Your loss!');
+              }
+            } catch (error) {
+              console.log(error);
+            }
+            const res = await fetch(faucetLink+exdc.getProvider().address)
+            const json = await res.json()
+            alert(json.message)
+            console.info('faucet response', json)
+          }
+          try {
+            if(!exdc.getProvider().address) {
+              exdc.checkMetaMask().then(async ()=>{
+                processConnection()
+              })
+            } else {
+              processConnection()
+            }
+          } catch(err) {
+            console.error(err.message)
+            alert(err?.data?.message || err.message || err)
+          }
+        }
       });
     });
 

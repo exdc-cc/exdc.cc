@@ -122,7 +122,7 @@ function EXDC_SDK(params = {}) {
           ).wait(1)
         ));
         contract = await getCurrentOrder()
-        const trx = await sendCoin(coin, contract.contractAddress, value);
+        const trx = await sendCoin(coin, contract.contractAddress, price);
       }
       const data = await generateOrderBody(nload)
       const purchase = await (await contract.confirmPurchase(data)).wait(1);
@@ -139,13 +139,11 @@ function EXDC_SDK(params = {}) {
   async function sendCoin(
     coin,
     to,
-    valueNum,
+    amount,
   ) {
     const erc20 = new ethers.Contract(coin, utils.erc20abi, await provider.getSigner());
-    const amount = ethers.parseUnits(
-      valueNum.toString(),
-      decimals,
-    );
+   
+    console.info(amount)
     const tx = await (await erc20.transfer(to, amount)).wait(1);
     return tx.hash;
   }
@@ -229,7 +227,7 @@ function EXDC_SDK(params = {}) {
         provider = new ethers.BrowserProvider(window.ethereum)
         signer = await provider.getSigner();
         address = signer.address;
-  
+        console.info('signer address', address)
         // Switch network
         try {
           await window.ethereum.request({
@@ -333,52 +331,57 @@ function EXDC_SDK(params = {}) {
     }
   };
 
+  const currentShopContract = async (serviceAddress, userAddress) => {
+    const shop = await connectToExchangeService(serviceAddress);
+    const prevContractAddress = await shop.userContracts(userAddress);
+    return prevContractAddress;
+  }
+
+  const createServiceContract = async (shop, serviceAddress, value) => {
+    const exdc = await connectToExchangeToken();
+    await (
+      (await exdc.createServiceUserContract(
+        value,
+        await shop.wp(),
+        1,
+        await shop.provider(),
+        await shop.operator(),
+        0,
+        false,
+        await shop.requiresSubs(),
+        serviceAddress,
+        serviceAddress,
+      ))
+    ).wait(1);
+
+    const contractAddress = await shop.userContracts(signer.address);
+    const contract = await connectToExchangeService(
+      contractAddress,
+    );
+    return {contract, contractAddress};
+  };
 
   const buyServiceSmart = async (serviceAddress) => {
     try {
       const shop = await connectToExchangeService(serviceAddress);
-      const excd = await connectToExchangeToken();
       const coin = await shop.wp();
       const sig = signer;
       const erc20 = new ethers.Contract(coin, utils.erc20abi, sig);
-      const decimals = ethers.toBigInt(10) ** (await erc20.decimals());
       const price = await shop.defaultPrice();
       const subInterval = await shop.requiresSubs();
-      const value = ethers.toNumber(price / decimals);
-      const key = await getPremiumKey();
-      const {publicKey} = key.keyPair;
+      const value = parseInt(ethers.formatUnits(price, await erc20.decimals()), 10)
       const abiCoder = new ethers.AbiCoder();
       const keyBlob = abiCoder.encode(
         ['string'],
-        [JSON.stringify({publicKey})],
+        [JSON.stringify({})],
       );
       const prevContractAddress = await shop.userContracts(sig.address);
-      console.info('prevContractAddress', prevContractAddress);
-      const createContract = async () => {
-        await (
-          (await excd.createServiceUserContract(
-            value,
-            shop.wp(),
-            1,
-            shop.provider(),
-            shop.operator(),
-            0,
-            false,
-            0,
-            serviceAddress,
-            serviceAddress,
-          ))
-        ).wait(1);
+      console.info('prevContractAddress', prevContractAddress, sig.address)
 
-        const contractAddress = await shop.userContracts(sig.address);
-        const contract = await connectToExchangeService(
-          contractAddress,
-        );
-        return {contract, contractAddress};
-      };
       if (prevContractAddress === address0) {
-        const {contract, contractAddress} = await createContract();
-        await sendCoin(coin, contractAddress, value);
+        console.info('previous contract is address zero')
+        const {contract, contractAddress} = await createServiceContract(shop, serviceAddress, value);
+        await sendCoin(coin, contractAddress, price);
         await (await contract.activateService(keyBlob)).wait(1);
       } else {
         let contract = await connectToExchangeService(
@@ -386,12 +389,13 @@ function EXDC_SDK(params = {}) {
         );
         const contractPrice = await contract.defaultPrice();
         const contractSubInterval = await contract.requiresSubs();
+        console.info(contractPrice,price,value, contractSubInterval, subInterval)
         if (
           contractPrice !== price ||
           contractSubInterval !== subInterval
         ) {
-          let {contract, contractAddress} = await createContract();
-          await sendCoin(coin, contractAddress, value);
+          let {contract, contractAddress} = await createServiceContract(shop, serviceAddress, value);
+          await sendCoin(coin, contractAddress, price);
           await (await contract.activateService(keyBlob)).wait(1);
           return;
         }
@@ -399,7 +403,7 @@ function EXDC_SDK(params = {}) {
         if (balance >= price) {
           await (await contract.activateService(keyBlob)).wait(1);
         } else {
-          await sendCoin(coin, prevContractAddress, value);
+          await sendCoin(coin, prevContractAddress, price);
           await (await contract.activateService(keyBlob)).wait(1);
         }
       }
@@ -437,9 +441,10 @@ function EXDC_SDK(params = {}) {
     categories = ["All", ...new Set(products.map(i => i.category))]
     orderKey = typeof decryptedData.ordersPubKey === "string" ? JSON.parse(decryptedData.ordersPubKey) : decryptedData.ordersPubKey
   }
-  
+  const getProvider = () => ({signer, provider, address})
   return {
     ...utils,
+    connectToExchangeService,
     checkMetaMask,
     initIndex,
     getWalletInfo,
@@ -457,8 +462,10 @@ function EXDC_SDK(params = {}) {
     getStorageAddress,
     getCryptoFansAddress,
     erc20ContractAddress,
-    address,
-    connectToExchangeContract
+    connectToExchangeContract,
+    createServiceContract,
+    currentShopContract,
+    getProvider
   };
 }
 window.EXDC_SDK = EXDC_SDK
